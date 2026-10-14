@@ -36,6 +36,40 @@ def test_session_lifecycle_and_history(client):
     assert history["total_pauses"] == 2
 
 
+def test_session_detail_includes_full_record_and_interruption_timeline(client):
+    session_id = create_session(client)
+    client.patch(f"/sessions/{session_id}/start")
+    client.patch(f"/sessions/{session_id}/pause", json={"reason": "Phone call"})
+    client.patch(f"/sessions/{session_id}/resume")
+    response = client.get(f"/sessions/{session_id}")
+    assert response.status_code == 200
+    detail = response.json()
+    assert detail["id"] == session_id
+    assert detail["title"] == "Deep work"
+    assert detail["goal"] == "Finish the draft"
+    assert detail["scheduled_duration"] == 50
+    assert detail["status"] == "active"
+    assert detail["start_time"] is not None
+    assert detail["created_at"] is not None
+    assert detail["elapsed_minutes"] >= detail["focus_minutes"]
+    assert detail["pause_count"] == 1
+    assert detail["interruptions"][0]["reason"] == "Phone call"
+    assert detail["interruptions"][0]["pause_time"] is not None
+    assert detail["interruptions"][0]["resume_time"] is not None
+
+
+def test_local_vite_origins_can_read_session_details(client):
+    response = client.options(
+        "/sessions/1",
+        headers={
+            "Origin": "http://127.0.0.1:5174",
+            "Access-Control-Request-Method": "GET",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5174"
+
+
 def test_fourth_pause_interrupts_session(client):
     session_id = create_session(client)
     client.patch(f"/sessions/{session_id}/start")
@@ -92,5 +126,5 @@ def test_pause_after_deadline_is_abandoned_immediately(client, test_session_fact
 
 
 def test_missing_session_returns_not_found(client):
-    response = client.patch("/sessions/999/start")
+    response = client.get("/sessions/999")
     assert response.status_code == 404

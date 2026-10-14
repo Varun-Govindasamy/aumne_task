@@ -31,6 +31,8 @@ runapplication.bat
 
 The API is at `http://127.0.0.1:8000`, interactive OpenAPI documentation is at `http://127.0.0.1:8000/docs`, and the frontend is at `http://localhost:5173`.
 
+If port 8000 is unavailable, start the API on another port and set `VITE_API_URL` to that API origin before starting the frontend, for example `set VITE_API_URL=http://127.0.0.1:8001`.
+
 To run the backend or frontend separately:
 
 ```bat
@@ -46,7 +48,10 @@ npm start
 - `PATCH /sessions/{id}/pause` pauses an active session with a `reason`.
 - `PATCH /sessions/{id}/resume` resumes a paused session.
 - `PATCH /sessions/{id}/complete` completes an active session.
+- `GET /sessions/{id}` returns the full record and interruption timeline for one session.
 - `GET /sessions/history` returns session records and aggregate focus, pause, and completion statistics.
+
+Select a session title in the frontend to open its dedicated detail page. Direct links to `/sessions/{id}` are supported.
 
 Invalid state transitions return `409`, missing sessions return `404`, and invalid request data returns `422`.
 

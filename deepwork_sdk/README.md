@@ -93,6 +93,7 @@ Class | Method | HTTP request | Description
 *SessionsApi* | [**complete_session_sessions_session_id_complete_patch**](docs/SessionsApi.md#complete_session_sessions_session_id_complete_patch) | **PATCH** /sessions/{session_id}/complete | Complete Session
 *SessionsApi* | [**create_session_sessions_post**](docs/SessionsApi.md#create_session_sessions_post) | **POST** /sessions/ | Create Session
 *SessionsApi* | [**get_history_sessions_history_get**](docs/SessionsApi.md#get_history_sessions_history_get) | **GET** /sessions/history | Get History
+*SessionsApi* | [**get_session_sessions_session_id_get**](docs/SessionsApi.md#get_session_sessions_session_id_get) | **GET** /sessions/{session_id} | Get Session
 *SessionsApi* | [**pause_session_sessions_session_id_pause_patch**](docs/SessionsApi.md#pause_session_sessions_session_id_pause_patch) | **PATCH** /sessions/{session_id}/pause | Pause Session
 *SessionsApi* | [**resume_session_sessions_session_id_resume_patch**](docs/SessionsApi.md#resume_session_sessions_session_id_resume_patch) | **PATCH** /sessions/{session_id}/resume | Resume Session
 *SessionsApi* | [**start_session_sessions_session_id_start_patch**](docs/SessionsApi.md#start_session_sessions_session_id_start_patch) | **PATCH** /sessions/{session_id}/start | Start Session

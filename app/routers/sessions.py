@@ -186,3 +186,8 @@ def get_history(db: Session = Depends(get_db)) -> HistoryResponse:
         total_focus_minutes=sum(session.focus_minutes for session in responses),
         total_pauses=sum(session.pause_count for session in responses),
     )
+
+
+@router.get("/{session_id}", response_model=SessionResponse)
+def get_session(session_id: int, db: Session = Depends(get_db)) -> SessionResponse:
+    return session_response(load_session(db, session_id))
