@@ -1,0 +1,198 @@
+As part of our hiring process, we have designed a coding challenge to assess your backend, frontend, database, and API development skills. The challenge requires you to build a Task Management System using FastAPI, SQLite, ReactJS, and OpenAPI-based SDK generation.
+
+📌 Challenge Details: 
+
+You will develop a backend API with FastAPI & SQLite.
+You will create a ReactJS frontend that interacts with the API.
+You will generate a Python SDK using OpenAPI Generator CLI (instead of manually coding it).
+You will automate setup & execution using batch scripts.
+The backend includes a trick requirement where task status can only change in a specific order.
+ 
+
+You can find the full challenge description:
+
+# Challenge: Deep Work Session Tracker
+## Objective:
+Build a system to plan, start, pause, resume, and complete focused work
+sessions.
+Track interruptions and provide summaries for productivity reflection.
+Includes FastAPI + SQLite backend, ReactJS frontend, Python SDK,
+automation scripts.
+Your solution should be fully functional, adhere to OpenAPI standards,
+and demonstrate best practices in backend, frontend, database, and SDK
+development.
+---
+## Tasks & Requirements
+### 1. Backend Development (FastAPI & SQLite)
+Implement a FastAPI service with the following endpoints:
+- **POST /sessions/** → Schedule a new work session (title, duration,
+goal).
+- **PATCH /sessions/{session_id}/start** → Start the session.
+- **PATCH /sessions/{session_id}/pause** → Pause the session (log
+interruption reason).
+- **PATCH /sessions/{session_id}/resume** → Resume a paused session.
+- **PATCH /sessions/{session_id}/complete** → Mark session completed
+(store completion time).
+- **GET /sessions/history** → Summary of past sessions (durations,
+pauses, completion ratio).
+Use SQLite as the database.
+Ensure the API follows OpenAPI standards (Swagger UI should be
+accessible).
+Implement error handling (appropriate 4xx/5xx).
+Use dependency injection for database operations.
+Write unit tests for the backend.
+#### Trick Logic in Backend (Hidden Complexity)
+- A session can only be **paused** if it's currently **active**.
+- If paused more than **3 times**, mark the session as **interrupted**.
+- A session must be completed within **10%** of its original duration,
+else **overdue**.
+- If never resumed after a pause → **abandoned**.
+**Your implementation should correctly enforce the rules above.**
+** Examples:**
+- 50-min session paused 2× → **completed**
+- Paused 4× → **interrupted**
+- Not resumed after pause → **abandoned**
+- Completed 60 mins after 50 → **overdue**
+---
+### 2. Database (SQLite)
+Create the following database tables:
+```
+CREATE TABLE sessions (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+title TEXT NOT NULL,
+goal TEXT,
+scheduled_duration INTEGER NOT NULL,
+start_time TIMESTAMP,
+end_time TIMESTAMP,
+status TEXT CHECK (status IN
+('scheduled','active','paused','completed','interrupted','abandoned','ove
+rdue')) DEFAULT 'scheduled',
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+```
+CREATE TABLE interruptions (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+session_id INTEGER NOT NULL,
+reason TEXT NOT NULL,
+pause_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+);
+```
+Use Alembic for database migrations.
+Provide a sample SQL file (`seed_data.sql`) to populate initial test
+data.
+---
+### 3. Frontend Client (ReactJS)
+Develop a ReactJS-based frontend.
+Use Axios for making API calls.
+The frontend should allow users to:
+- Schedule a session (title, goal, duration)
+- Start/Pause/Resume/Complete a session
+- Enter reason when pausing
+- View history including status and stats
+- (Bonus) Live countdown timer while active
+Ensure the frontend interacts only via API calls (no direct database
+access).
+Style is not a priority, but functionality must work correctly.
+** Bonus:** Real-time updates where meaningful.
+---
+### 4. Platform SDK (Generated via OpenAPI Generator CLI)
+Instead of manually writing an SDK, generate a Python SDK using the
+OpenAPI Generator CLI. This SDK should allow interaction with the API.
+**Instructions to Generate SDK**
+```bash
+npm install -g @openapitools/openapi-generator-cli
+openapi-generator-cli generate -i http://localhost:8000/openapi.json -g
+python -o deepwork_sdk
+```
+**Expected SDK Usage (After Generation & Testing):**
+```python
+from deepwork_sdk.api.sessions_api import SessionsApi
+from deepwork_sdk import ApiClient
+client = ApiClient()
+api = SessionsApi(client)
+# Example usage
+# result = api.<your_method_here>()
+# print(result)
+```
+---
+### 5. Development Setup Script (`setupdev.bat`)
+Create a Windows batch script to set up the environment:
+```bat
+@echo off
+echo Setting up backend...
+python -m venv env
+call env\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+echo Setting up frontend...
+cd frontend
+npm install
+cd ..
+echo Setup complete.
+```
+---
+### 6. Execution Script (`runapplication.bat`)
+Create a Windows batch script to start the full application.
+```bat
+@echo off
+echo Starting backend...
+call env\Scripts\activate
+python main.py
+echo Starting frontend...
+cd frontend
+npm start
+```
+---
+## Evaluation Criteria
+Code Quality: Well-structured, clean, and modular code.
+Correct API Implementation: API should work correctly and follow
+OpenAPI standards.
+Proper Error Handling: Handles bad inputs and errors gracefully.
+Platform SDK Generation: SDK must be generated correctly using OpenAPI
+Generator CLI.
+Frontend Integration: The ReactJS frontend should correctly
+communicate with the backend.
+Automation Scripts: setupdev.bat and runapplication.bat should work as
+expected.
+Unit Tests: Backend should include test cases.
+Documentation: Include a README with installation and execution steps.
+Backend Trick Logic: Ensure candidates correctly implement the
+specified rules.
+---
+## Deliverables
+- Backend (FastAPI) source code
+- SQLite database & migration files
+- ReactJS frontend code
+- Python SDK (generated via OpenAPI Generator CLI)
+- Setup & Execution Scripts (`setupdev.bat`, `runapplication.bat`)
+- Unit tests for backend
+- README explaining how to set up and run the project
+**Time Limit:** 2–3 Days
+---
+## Additional Notes
+- You are **NOT** allowed to use Docker.
+- Ensure proper API validation and error handling.
+- The frontend does **not** need to be fancy – focus on functionality.
+- Bonus points for implementing extra features like charts or real-time
+updates.
+
+
+Write code in a natural, human-like way, as an experienced developer would in a real-world project or coding interview.
+
+Follow these rules strictly:
+
+- **No comments in the code.** Do not include inline comments, explanatory comments, or docstrings unless explicitly requested.
+- **Keep the code simple and readable.** Prefer straightforward logic over unnecessarily complex or overly clever solutions.
+- **Use natural coding patterns.** Write code that looks like something a developer would realistically write, rather than code that feels artificially generated or overly polished.
+- **Avoid overengineering.** Do not introduce unnecessary abstractions, helper functions, classes, design patterns, or excessive error handling when a simpler solution works.
+- **Use meaningful variable names.** Choose clear, practical names that make the code easy to understand without needing comments.
+- **Prefer simplicity over unnecessary optimization.** Use efficient solutions where appropriate, but do not sacrifice readability for minor performance improvements.
+- **Follow the conventions of the chosen programming language.** Keep formatting, naming, and structure consistent with common industry practices.
+- **Avoid unnecessary boilerplate.** Include only the code required to solve the problem. Do not add redundant imports, unused variables, excessive validation, or unrelated functionality.
+- **Match the problem's complexity.** For coding interview and DSA problems, prefer intuitive approaches that are easy to explain and implement. Use advanced techniques only when the problem requires them.
+- **Preserve the requested output format.** If asked for code only, return only the code. If an explanation is requested, provide it separately from the code.
+- **Do not change working code unnecessarily.** When modifying existing code, preserve its original structure and style wherever practical, making only the changes needed to achieve the requested result.
+
+The final code should be functional, readable, maintainable, and concise. Prioritize practical human-written code over unnecessarily elaborate solutions, while ensuring correctness and following the requirements of the task.
